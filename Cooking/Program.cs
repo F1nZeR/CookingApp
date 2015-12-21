@@ -55,10 +55,6 @@ namespace Cooking
         private static Tuple<List<CookingInfo>, double[][]> GetItems(int from, int to)
         {
             var items = ParseInfo(true).Skip(from).Take(to).ToList();
-            if (from == 15000)
-            {
-                items[0].Ingredients = new List<string>() {"QWOTIUQOPTUJYQWIOKTRFJQWOJTIOWQK"};
-            }
             var file = File.OpenRead("../../full7z-mlteast-en.lem");
             var lemmatizer = new Lemmatizer(file);
             foreach (var cookingInfo in items)
@@ -84,13 +80,13 @@ namespace Cooking
             var outputLabels = trainItems.Select(x => distinctResults.IndexOf(x.Cuisine)).ToArray();
             var outputs = Accord.Statistics.Tools.Expand(outputLabels, 20, -1, +1);
 
-            var network = new ActivationNetwork(new BipolarSigmoidFunction(), normTrainItems[0].Length, 500, 20);
+            var network = new ActivationNetwork(new BipolarSigmoidFunction(), normTrainItems[0].Length, 700, 300, 20);
             new NguyenWidrow(network).Randomize();
             var teacher = new ParallelResilientBackpropagationLearning(network);
             Console.Out.WriteLine("Network created");
 
             var error = double.PositiveInfinity;
-            while (error > 21500)
+            while (error > 22000)
             {
                 error = teacher.RunEpoch(normTrainItems, outputs);
                 Console.Out.WriteLine("error = {0}", error);
@@ -108,7 +104,7 @@ namespace Cooking
                 resList.Add($"{testItems[i].Id},{resCousine}");
             }
 
-            File.WriteAllLines("outresult.csv", resList);
+            File.WriteAllLines("outresult2.csv", resList);
 
             //var test = GetItems(15000, 500);
             //var testItems = test.Item1;
